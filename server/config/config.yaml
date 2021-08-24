@@ -1,0 +1,15 @@
+ResisDB:
+  IP: "localhost"
+  Port: 6379
+  DB: 1
+
+MysqlDB:
+  IP: "127.0.0.1"
+  Port: 3306
+  DB: "demo"
+  User: "demo"
+  Password: "demo123"
+
+GolangServer:
+  IP: "localhost"
+  Port: "8080"

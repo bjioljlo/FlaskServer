@@ -9,7 +9,15 @@ MysqlDB:
   DB: "demo"
   User: "demo"
   Password: "demo123"
+  Network: "tcp"
 
 GolangServer:
   IP: "localhost"
-  Port: "8080"
+  Host: "0.0.0.0"
+  Port: 8080
+  ENV: "debug"
+  ViewsPath: "server/view/html/*"
+
+FlaskServer:
+  IP: "localhost"
+  Port: 5000

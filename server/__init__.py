@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 import redis
 import yaml
 import os
-
 from yaml.loader import SafeLoader
 server_filePath = os.getcwd()#取得目錄路徑
 server_flask = Flask(__name__)#初始化server
@@ -21,7 +20,7 @@ server_flask.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://" + config_dat
 #連線mysql DB
 DB_mysql = SQLAlchemy(server_flask)
 #Golang server url
-Server_Golang = 'http://'+ config_data['GolangServer']['IP']+':'+ config_data['GolangServer']['Port']
+Server_Golang = 'http://'+ config_data['GolangServer']['IP']+':'+ str(config_data['GolangServer']['Port'])
 from server.router import Router
 #註冊網址RESTful
 Router.RegisterRouters()

@@ -1,3 +1,4 @@
+
 from server.controllers import ChannelFunctions
 from server.models import StockModel
 from backtesting import Strategy,Backtest #引入回測和交易策略功能
@@ -6,7 +7,6 @@ import math
 import pandas as pd
 import yfinance as yf
 from pandas_datareader import data
-import os
 import pandas as pd
 from datetime import datetime
 
@@ -266,9 +266,11 @@ def go_DONCH_test(number,money,q):
 
   print(result) #直接print文字結果
 
-  test.plot(filename="/Users/apple/go/src/test_pj/template/html" + '/' + target_stock + '.html') #將線圖網頁依照指定檔名保存
+  test.plot(filename="/Users/apple/Python/FlaskServer/server/templates" + '/' + target_stock + '.html',open_browser=False)
+  f = open("/Users/apple/Python/FlaskServer/server/templates" + '/' + target_stock + '.html','r')
   q.put(result)
   q.put(use_BacktestInfo.tomorrow_action)
+  q.put(f.read())
   return True
 
 #讀取

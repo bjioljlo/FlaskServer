@@ -23,7 +23,7 @@ def show_HTML(name):
 
 #跑回側
 def run_test(number,money):
-    StockModel.setSearchHistory(number)
+    
     try:
         temp_data = StockModel.getStockInfo(number)
         result = json.loads(temp_data.result)
@@ -34,12 +34,15 @@ def run_test(number,money):
             return redirect(Server_Golang +'/stock?stock=' + number)
     except:
         pass
-
+    
     StockModel.deletStockInfo(number)
     q = Queue()
     temp_thread = threading.Thread(target=BacktestStrategy.go_DONCH_test,args=[number,money,q])
     temp_thread.start()
     temp_thread.join()
+    if q.empty():
+        return redirect(Server_Golang  +'/index')
+    StockModel.setSearchHistory(number)
     result = q.get()
     action = q.get()
     html = q.get()

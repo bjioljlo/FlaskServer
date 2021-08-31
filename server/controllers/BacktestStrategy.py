@@ -1,4 +1,5 @@
 
+from numpy import fabs, true_divide
 from server.controllers import ChannelFunctions
 from server.models import StockModel
 from backtesting import Strategy,Backtest #引入回測和交易策略功能
@@ -258,6 +259,7 @@ def go_DONCH_test(number,money,q):
   target_stock = number
   account_money = money
   df = getStockInfo(target_stock)#pandas讀取資料，並將第1欄作為索引欄
+  if df.empty: return False
   test = Backtest(df, DONCHCross, cash=account_money, commission=.004)
   #指定回測程式為test，在Backtest函數中依序放入(資料來源、策略、現金、手續費)
 
@@ -297,6 +299,9 @@ def getStockInfo(stock):
         start_date = datetime(2005,1,1)
         end_date = datetime.today()#設定資料起訖日期
         df = data.get_data_yahoo([target_stock], start_date, end_date,index_col=0)
+        if df.empty:
+          print("yahoo no data:" + str(target_stock))
+          return df
         StockModel.saveStockDay(target_stock,df)
         #df.to_csv(filename)
         mask = df.index >= use_BacktestInfo.start_day

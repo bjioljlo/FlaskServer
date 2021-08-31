@@ -1,10 +1,14 @@
 ResisDB:
+  # IP: "122.116.102.141"
+  # Port: 6380
   IP: "localhost"
   Port: 6379
   DB: 1
 
 MysqlDB:
-  IP: "127.0.0.1"
+  # IP: "122.116.102.141"
+  # Port: 3307
+  IP: "localhost"
   Port: 3306
   DB: "demo"
   User: "demo"

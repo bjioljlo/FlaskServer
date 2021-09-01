@@ -10,6 +10,7 @@ import yfinance as yf
 from pandas_datareader import data
 import pandas as pd
 from datetime import datetime
+from server import server_filePath
 
 class BacktestStrategyInfo():
     def __init__(self):
@@ -268,8 +269,8 @@ def go_DONCH_test(number,money,q):
 
   print(result) #直接print文字結果
 
-  test.plot(filename="/Users/apple/Python/FlaskServer/server/templates" + '/' + target_stock + '.html',open_browser=False)
-  f = open("/Users/apple/Python/FlaskServer/server/templates" + '/' + target_stock + '.html','r')
+  test.plot(filename=server_filePath+"/server/templates" + '/' + target_stock + '.html',open_browser=False)
+  f = open(server_filePath+"/server/templates" + '/' + target_stock + '.html','r')
   q.put(result)
   q.put(use_BacktestInfo.tomorrow_action)
   q.put(f.read())

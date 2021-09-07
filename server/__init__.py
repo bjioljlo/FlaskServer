@@ -4,6 +4,7 @@ import redis
 import yaml
 import os
 from yaml.loader import SafeLoader
+import threading
 server_filePath = os.getcwd()#取得目錄路徑
 server_flask = Flask(__name__)#初始化server
 #取得config
@@ -24,7 +25,10 @@ Server_Golang = 'http://'+ config_data['GolangServer']['IP']+':'+ str(config_dat
 from server.router import Router
 #註冊網址RESTful
 Router.RegisterRouters()
-
+from server.packages import socket
+from server.controllers import StockController
+temp_threading = threading.Thread(target=socket.Run,args=["0.0.0.0",5010,StockController.run_test])
+temp_threading.start()
 
 
 

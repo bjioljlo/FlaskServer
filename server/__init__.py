@@ -4,7 +4,7 @@ import redis
 import yaml
 import os
 from yaml.loader import SafeLoader
-import threading
+
 server_filePath = os.getcwd()#取得目錄路徑
 server_flask = Flask(__name__)#初始化server
 #取得config
@@ -22,13 +22,15 @@ server_flask.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://" + config_dat
 DB_mysql = SQLAlchemy(server_flask)
 #Golang server url
 Server_Golang = 'http://'+ config_data['GolangServer']['IP']+':'+ str(config_data['GolangServer']['Port'])
-from server.router import Router
 #註冊網址RESTful
+from server.router import Router
 Router.RegisterRouters()
+#開啟socket
 from server.packages import socket
 from server.controllers import StockController
-temp_threading = threading.Thread(target=socket.Run,args=["0.0.0.0",5010,StockController.run_test])
-temp_threading.start()
+Server_Socket = socket.SocketServer(config_data["FlaskServer"]["SocketHost"],config_data["FlaskServer"]["SocketPort"],StockController.reciveMsg)
+Server_Socket.Run()
+
 
 
 

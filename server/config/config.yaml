@@ -8,7 +8,7 @@ ResisDB:
 MysqlDB:
   # IP: "122.116.102.141"
   # Port: 3307
-  IP: "localhost"
+  IP: "127.0.0.1"
   Port: 3306
   DB: "demo"
   User: "demo"
@@ -25,3 +25,5 @@ GolangServer:
 FlaskServer:
   IP: "localhost"
   Port: 5000
+  SocketHost: "0.0.0.0"
+  SocketPort: 5010

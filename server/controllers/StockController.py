@@ -50,3 +50,10 @@ def run_test(number,money):
     action = json.dumps(action)
     StockModel.addStockInfo(number,html,result,action)
     return redirect(Server_Golang  +'/stock?stock=' + number)
+
+
+def reciveMsg(indata):
+    result = json.loads(indata)
+    if result["firstNum"] == 1:
+        if result["secondNum"] == 1:
+            run_test(result["msg"],500000)

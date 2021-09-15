@@ -23,7 +23,6 @@ def show_HTML(name):
 
 #跑回側
 def run_test(number,money):
-    
     try:
         temp_data = StockModel.getStockInfo(number)
         result = json.loads(temp_data.result)
@@ -34,7 +33,6 @@ def run_test(number,money):
             return redirect(Server_Golang +'/stock?stock=' + number)
     except:
         pass
-    
     StockModel.deletStockInfo(number)
     q = Queue()
     temp_thread = threading.Thread(target=BacktestStrategy.go_DONCH_test,args=[number,money,q])
@@ -42,18 +40,25 @@ def run_test(number,money):
     temp_thread.join()
     if q.empty():
         return redirect(Server_Golang  +'/index')
-    StockModel.setSearchHistory(number)
     result = q.get()
     action = q.get()
     html = q.get()
     result = json.dumps(to_dict(result))
     action = json.dumps(action)
     StockModel.addStockInfo(number,html,result,action)
-    return redirect(Server_Golang  +'/stock?stock=' + number)
+    #return redirect(Server_Golang  +'/stock?stock=' + number)
 
-
+#接收socket資料處理
 def reciveMsg(indata):
     result = json.loads(indata)
     if result["firstNum"] == 1:
         if result["secondNum"] == 1:
             run_test(result["msg"],500000)
+            StockModel.setSearchHistory(result["msg"])
+        elif result["secondNum"] == 2:
+            run_test(result["msg"],500000)
+            # msg = json.loads(result["msg"])
+            # for i in int(msg['count']):
+            #     temp_thread = threading.Thread(target=run_test,args=[msg["msg" + i],500000])
+            #     temp_thread.start()
+            #     temp_thread.join()

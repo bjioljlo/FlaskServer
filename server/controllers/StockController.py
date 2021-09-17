@@ -62,3 +62,7 @@ def reciveMsg(indata):
             #     temp_thread = threading.Thread(target=run_test,args=[msg["msg" + i],500000])
             #     temp_thread.start()
             #     temp_thread.join()
+    elif result["firstNum"] == 2:
+        if result["secondNum"] == 1:
+            StockModel.deleteStockDayTable(result["msg"])
+            StockModel.deletStockInfo(result["msg"])

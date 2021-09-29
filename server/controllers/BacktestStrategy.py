@@ -286,7 +286,7 @@ def getStockInfo(stock):
             #df = pd.read_csv(server.server_filePath + '/server/TempData/' + target_stock + '.csv', index_col=0) #pandas讀取資料，並將第1欄作為索引欄
             df = StockModel.readStockDay(target_stock)
             try:#SQL有資料要看是否最新
-                df[datetime.today()]
+                #df[datetime.today()]
                 mask = df.index >= use_BacktestInfo.start_day
                 result = df[mask]
                 result = result.dropna(axis = 0,how = 'any')

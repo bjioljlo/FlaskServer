@@ -4,7 +4,7 @@ import threading
 from server import Server_Golang
 from flask import redirect,render_template
 from pandas.core.frame import DataFrame
-from datetime import datetime
+from datetime import timedelta,datetime
 from server.controllers import BacktestStrategy
 from server.models import StockModel
 
@@ -28,8 +28,9 @@ def run_test(number,money):
         result = json.loads(temp_data.result)
         data_date = datetime.strptime(result["End"],"%Y-%m-%d %H:%M:%S")
         today = datetime.today().date()
+        yesterday = (datetime.today() - timedelta(days=1)).date()
         data_date = data_date.date()
-        if data_date == today:
+        if data_date == today or data_date == yesterday:
             return redirect(Server_Golang +'/stock?stock=' + number)
     except:
         pass

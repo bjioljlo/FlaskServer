@@ -65,5 +65,6 @@ def reciveMsg(indata):
             #     temp_thread.join()
     elif result["firstNum"] == 2:
         if result["secondNum"] == 1:
-            StockModel.deleteStockDayTable(result["msg"])
             StockModel.deletStockInfo(result["msg"])
+            if datetime.now().hour >= 9 and datetime.now().hour < 14:
+                StockModel.deleteStockDayTable(result["msg"])

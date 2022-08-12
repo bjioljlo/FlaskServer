@@ -1,3 +1,4 @@
+from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 from server import DB_mysql, DB_redis
 
@@ -37,10 +38,16 @@ def deleteStockDayTable(name):
     temp_table = StockDayInfo.__table__
     temp_table.name = name
     StockDayInfo.__table__ = temp_table
-    StockDayInfo.__table__.drop(DB_mysql.session.bind)
+    try:
+        StockDayInfo.__table__.drop(DB_mysql.session.bind)
+    except Exception as e:
+        print('SQL Error (deleteStockDayTable) {}'.format(e.args))
 
 def saveStockDay(name,data):
-    data.to_sql(name=name,con=DB_mysql.engine)
+    try:
+        data.to_sql(name=name,con=DB_mysql.engine)
+    except Exception as e:
+        print('SQL Error (saveStockDay) {}'.format(e.args))
 
 def readStockDay(name):
     dataframe = pd.DataFrame()
@@ -48,7 +55,7 @@ def readStockDay(name):
         dataframe = pd.read_sql(sql = name,con=DB_mysql.engine,index_col='Date')
         return dataframe
     except Exception as e:
-        print('SQL Error {}'.format(e.args))
+        print('SQL Error (readStockDay) {}'.format(e.args))
        
 
 class StockBackInfo():

@@ -22,13 +22,14 @@ class BacktestStrategyInfo():
         self.open_long_trade = True #@param {type:"boolean"}
         self.open_short_trade = False #@param {type:"boolean"}
         self.tomorrow_action = {}
-    def save_action(self,Date,buy_sell,UnitNumber,BuyPrice,SellPrice,long_short):
+    def save_action(self,Date,buy_sell,UnitNumber,BuyPrice,SellPrice,long_short,UnitSize):
         self.tomorrow_action['Date'] = str(Date)
         self.tomorrow_action['Buy_sell'] = str(buy_sell)
         self.tomorrow_action['UnitNumber'] = str(UnitNumber)
         self.tomorrow_action['BuyPrice'] = str(BuyPrice)
         self.tomorrow_action['SellPrice'] = str(SellPrice)
         self.tomorrow_action['long_short'] = str(long_short)
+        self.tomorrow_action['UnitSize'] = str(UnitSize)
 
 use_BacktestInfo = BacktestStrategyInfo()
 
@@ -109,7 +110,9 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
             else:
               self.clear_trade_mark = False
           
-        Unit = (self.now_cash * 0.01) / (NATR * self.backtestInfo.dollar_per_point)  
+        Unit = (self.now_cash * 0.01) / (NATR * self.backtestInfo.dollar_per_point)
+        if NATR <= 0:
+          return
         if self.backtestInfo.open_long_trade == True:
           #突破忽略計算(多頭)
           if self.break_price > 0 and self.is_long_or_short > 0:
@@ -149,7 +152,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
                 self.next_buy_price_long = 0
                 self.clear_trade_mark = True
                 print('--'+"多單殺出:",close,self.trades.__len__(),self.stop_price_long)
-                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_long,'long')
+                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_long,'long',math.floor(float(Unit)))
         if self.backtestInfo.open_short_trade == True:
           #正向突破10日最高價，認賠殺出!!
           if self.trades.__len__() > 0 and entry_size_10 > 0:
@@ -159,7 +162,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
                 self.next_buy_price_short = 0
                 self.clear_trade_mark = True
                 print('--'+"空單殺出:",close,self.trades.__len__(),self.stop_price_short)
-                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_short,'short')
+                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_short,'short',math.floor(float(Unit)))
         if self.backtestInfo.open_long_trade == True:
           #股價下跌2N以上，止損賣出!!
           if self.trades.__len__() > 0 and close <= self.stop_price_long:
@@ -169,7 +172,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
                 self.next_buy_price_long = 0
                 self.clear_trade_mark = True
                 print('--'+"多單止損:",close,self.trades.__len__(),self.stop_price_long)
-                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_long,'long')
+                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_long,'long',math.floor(float(Unit)))
         if self.backtestInfo.open_short_trade == True:
           #股價上升2N以上，止損賣出!!
           if self.trades.__len__() > 0 and close >= self.stop_price_short:
@@ -179,7 +182,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
                 self.next_buy_price_short = 0
                 self.clear_trade_mark = True
                 print('--'+"空單止損:",close,self.trades.__len__(),self.stop_price_short)
-                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_short,'short')
+                self.backtestInfo.save_action(str(date),'sell',self.trades.__len__(),close,self.stop_price_short,'short',math.floor(float(Unit)))
         if self.trades.__len__() == 0:
           self.next_buy_price_short = 0
           self.next_buy_price_long = 0
@@ -201,14 +204,14 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
               self.next_buy_price_long = close + (NATR/2)
               self.buy(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point)
               self.stop_price_long = Temp_sl
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long',Temp_size)
               return
             if entry_size_55 > 0:
               print('--' +"55 多單進場:size="+str(math.floor(float(Unit))*self.backtestInfo.dollar_per_point),'sl = ' + str(Temp_sl))
               self.next_buy_price_long = close + (NATR/2)
               self.buy(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point)
               self.stop_price_long = Temp_sl
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long',Temp_size)
               return
           elif self.trades.__len__() < 4 and self.next_buy_price_long > 0:#突破之後加碼的地方
             if close > self.next_buy_price_long:
@@ -216,7 +219,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
               print('--' +"多單加碼:size="+str(math.floor(float(Unit))*self.backtestInfo.dollar_per_point),'sl = ' + str(Temp_sl) +'-' +str(self.trades.__len__()))
               self.stop_price_long = Temp_sl
               self.buy(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point) 
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_long,'long',Temp_size)
               return
 
         if self.backtestInfo.open_short_trade == True:
@@ -234,14 +237,14 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
               self.next_buy_price_short = close - (NATR/2)
               self.sell(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point)
               self.stop_price_short = Temp_sl
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short',Temp_size)
               return
             if entry_size_55 < 0:
               print('--' +"55 空單進場:size="+str(math.floor(float(Unit))*self.backtestInfo.dollar_per_point),'sl = ' + str(Temp_sl))
               self.next_buy_price_short = close - (NATR/2)
               self.sell(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point)
               self.stop_price_short = Temp_sl
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short',Temp_size)
               return
           elif self.trades.__len__() < 4 and self.next_buy_price_short > 0:#突破之後加碼的地方
             if close < self.next_buy_price_short:
@@ -249,7 +252,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
               print('--' +"空單加碼:size="+str(math.floor(float(Unit))*self.backtestInfo.dollar_per_point),'sl = ' + str(Temp_sl) +'-' +str(self.trades.__len__()))
               self.stop_price_short = Temp_sl
               self.sell(size = math.floor(float(Unit))*self.backtestInfo.dollar_per_point) 
-              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short')
+              self.backtestInfo.save_action(str(date),'buy',self.trades.__len__(),close,self.stop_price_short,'short',Temp_size)
               return     
 
 #唐西奇回測

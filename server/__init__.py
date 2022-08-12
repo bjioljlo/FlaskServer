@@ -18,6 +18,7 @@ DB_redis = redis.Redis(host=config_data['ResisDB']['IP'],port=config_data['Resis
 #設定mysql DB
 server_flask.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 server_flask.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://" + config_data['MysqlDB']['User'] + ":" + config_data['MysqlDB']['Password'] + "@" + config_data['MysqlDB']['IP'] + ":"+ str(config_data['MysqlDB']['Port']) +"/"+config_data['MysqlDB']['DB']
+server_flask.config['SQLALCHEMY_POOL_RECYCLE'] = 3600
 #連線mysql DB
 DB_mysql = SQLAlchemy(server_flask)
 #Golang server url

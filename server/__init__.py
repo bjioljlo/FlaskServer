@@ -6,6 +6,7 @@ import os
 from yaml.loader import SafeLoader
 
 server_filePath = os.getcwd()#取得目錄路徑
+print(server_filePath)
 server_flask = Flask(__name__)#初始化server
 #取得config
 def get_config():
@@ -31,9 +32,6 @@ from server.packages import socket
 from server.controllers import StockController
 Server_Socket = socket.SocketServer(config_data["FlaskServer"]["SocketHost"],config_data["FlaskServer"]["SocketPort"],StockController.reciveMsg)
 Server_Socket.Run()
-
-
-
-
-
-
+def RunServer():
+    #開啟FlaskServer
+    server_flask.run(host=config_data["FlaskServer"]["SocketHost"],port=config_data["FlaskServer"]["Port"])

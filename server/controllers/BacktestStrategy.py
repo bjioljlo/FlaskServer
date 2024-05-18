@@ -68,13 +68,13 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
         signal_up_10 = (high >= D_up_10) & (high.shift() < D_up_10.shift())
         # combine signal
         signal = signal_up.copy()
-        signal[signal_down] = -1
+        signal[signal_down] = False
         # combine signal
         signal_55 = signal_up_55.copy()
-        signal_55[signal_down_55] = -1
+        signal_55[signal_down_55] = False
         # combine signal
         signal_10 = signal_up_10.copy()
-        signal_10[signal_down_10] = -1
+        signal_10[signal_down_10] = False
         # plot sma
 
         # set signal to trade
@@ -303,7 +303,7 @@ def getStockInfo(stock):
         yf.pdr_override()
         start_date = datetime(2005,1,1)
         end_date = datetime.today()#設定資料起訖日期
-        df = data.get_data_yahoo([target_stock], start_date, end_date,index_col=0)
+        df = data.get_data_yahoo([target_stock], start_date, end_date)
         if df.empty:
           print("yahoo no data:" + str(target_stock))
           return df

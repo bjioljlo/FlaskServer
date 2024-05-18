@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
-from server import DB_mysql, DB_redis
+from server import DB_mysql, DB_redis, server_flask
 
 class StockDayInfo(DB_mysql.Model):
     __tablename__ = ""
@@ -25,35 +25,40 @@ def addStockDayInfo(stockInfo):
     tableee = stockInfo.__table__
     tableee.name = stockInfo.__tablename__
     stockInfo.__table__ = tableee
-    DB_mysql.session.add(stockInfo)
-    DB_mysql.session.commit()
+    with server_flask.app_context():
+        DB_mysql.session.add(stockInfo)
+        DB_mysql.session.commit()
 
 def createStockDayTable(stockInfo):
     temp_table = stockInfo.__table__
     temp_table.name = stockInfo.__tablename__
     stockInfo.__table__ = temp_table
-    stockInfo.__table__.create(DB_mysql.session.bind)
+    with server_flask.app_context():
+        stockInfo.__table__.create(DB_mysql.session.bind)
 
 def deleteStockDayTable(name):
     temp_table = StockDayInfo.__table__
     temp_table.name = name
     StockDayInfo.__table__ = temp_table
     try:
-        StockDayInfo.__table__.drop(DB_mysql.session.bind)
+        with server_flask.app_context():
+            StockDayInfo.__table__.drop(DB_mysql.session.bind)
     except Exception as e:
         print('SQL Error (deleteStockDayTable) {}'.format(e.args))
 
 def saveStockDay(name,data):
     try:
-        data.to_sql(name=name,con=DB_mysql.engine)
+        with server_flask.app_context():
+            data.to_sql(name=name,con=DB_mysql.engine)
     except Exception as e:
         print('SQL Error (saveStockDay) {}'.format(e.args))
 
 def readStockDay(name):
     dataframe = pd.DataFrame()
     try:
-        dataframe = pd.read_sql(sql = name,con=DB_mysql.engine,index_col='Date')
-        return dataframe
+        with server_flask.app_context():
+            dataframe = pd.read_sql(sql = name,con=DB_mysql.engine,index_col='Date')
+            return dataframe
     except Exception as e:
         print('SQL Error (readStockDay) {}'.format(e.args))
        

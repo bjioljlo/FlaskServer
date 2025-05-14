@@ -20,6 +20,7 @@ WORKDIR /FlaskServer
 # 將 Dockerfile 所在目錄下的所有檔案複製到 Image 的工作目錄 /FlaskServer 底下
 ADD . /FlaskServer
 
+RUN sudo apt-get install python3-dev
 # 在 Image 中執行的指令：安裝 requirements.txt 中所指定的 dependencies
 RUN pip install -r requirements.txt
 

@@ -235,13 +235,5 @@ src/testTestingRootWkspc/coverageWorkspace/.coverage
 # project ignore
 *.py.bak
 *.npy
-回測資料/
 templates/
-static/
-yieldInfo/
-monthRP/
-seasonInfo/
-stockInfo/
-*.csv
-*.png
 .qodo

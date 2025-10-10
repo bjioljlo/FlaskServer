@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 from server import DB_mysql, DB_redis, server_flask
 
@@ -61,7 +60,6 @@ def readStockDay(name):
             return dataframe
     except Exception as e:
         print('SQL Error (readStockDay) {}'.format(e.args))
-       
 
 class StockBackInfo():
     def __init__(self,name):

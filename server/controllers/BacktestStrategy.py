@@ -1,5 +1,3 @@
-
-from numpy import fabs, true_divide
 from server.controllers import ChannelFunctions
 from server.models import StockModel
 from backtesting import Strategy,Backtest #引入回測和交易策略功能
@@ -8,7 +6,6 @@ import math
 import pandas as pd
 import yfinance as yf
 from pandas_datareader import data
-import pandas as pd
 from datetime import datetime
 from server import server_filePath
 
@@ -16,8 +13,8 @@ class BacktestStrategyInfo():
     def __init__(self):
         self.account_money = 500000 #@param {type:"integer"}
         self.dollar_per_point =  1000#@param {type:"integer"}
-        self.start_day = "2010-01-01"#@param {type:"date"}
-        self.end_day = "2021-08-04"#@param {type:"date"}
+        self.start_day = "2015-01-01"#@param {type:"date"}
+        self.end_day = "2025-08-04"#@param {type:"date"}
         #允許只下多單還是空單
         self.open_long_trade = True #@param {type:"boolean"}
         self.open_short_trade = False #@param {type:"boolean"}
@@ -58,23 +55,23 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
         D_up_10,D_mid_10,D_low_10 = ChannelFunctions.DONCH(high,low,10)
 
         # Precompute signal
-        signal_down = (low <= D_low) & (low.shift() > D_low.shift())
-        signal_up = (high >= D_up) & (high.shift() < D_up.shift())
+        self.signal_down = (low <= D_low)# & (low.shift() > D_low.shift())
+        self.signal_up = (high >= D_up)# & (high.shift() < D_up.shift())
         # Precompute signal
-        signal_down_55 = (low <= D_low_55) & (low.shift() > D_low_55.shift())
-        signal_up_55 = (high >= D_up_55) & (high.shift() < D_up_55.shift())
+        self.signal_down_55 = (low <= D_low_55)# & (low.shift() > D_low_55.shift())
+        self.signal_up_55 = (high >= D_up_55)# & (high.shift() < D_up_55.shift())
         # Precompute signal
-        signal_down_10 = (low <= D_low_10) & (low.shift() > D_low_10.shift())
-        signal_up_10 = (high >= D_up_10) & (high.shift() < D_up_10.shift())
+        self.signal_down_10 = (low <= D_low_10)# & (low.shift() > D_low_10.shift())
+        self.signal_up_10 = (high >= D_up_10)# & (high.shift() < D_up_10.shift())
         # combine signal
-        signal = signal_up.copy()
-        signal[signal_down] = False
+        signal = self.signal_up.copy()
+        signal[self.signal_down] = False
         # combine signal
-        signal_55 = signal_up_55.copy()
-        signal_55[signal_down_55] = False
+        signal_55 = self.signal_up_55.copy()
+        signal_55[self.signal_down_55] = False
         # combine signal
-        signal_10 = signal_up_10.copy()
-        signal_10[signal_down_10] = False
+        signal_10 = self.signal_up_10.copy()
+        signal_10[self.signal_down_10] = False
         # plot sma
 
         # set signal to trade
@@ -85,6 +82,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
         self.D_mid = self.I(lambda x: D_mid, 'D_mid')
         self.D_low = self.I(lambda x: D_low, 'D_low')
         self.NATR = self.I(lambda x: NATR, 'NATR')
+        self.signal_down_10 = self.I(lambda x: self.signal_down_10, 'signal_down_10')
 
     def next(self):
         super().next()
@@ -145,7 +143,7 @@ class DONCHCross(Strategy): #使用backtesting.py的Strategy功能
 
         if self.backtestInfo.open_long_trade == True:
           #反向突破10日最低價，認賠殺出!!
-          if self.trades.__len__() > 0 and entry_size_10 < 0:
+          if self.trades.__len__() > 0 and self.signal_down_10[-1] == True:
             for trade in self.trades:
               if trade.is_long:
                 trade.close()

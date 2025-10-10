@@ -34,4 +34,4 @@ Server_Socket = socket.SocketServer(config_data["FlaskServer"]["SocketHost"],con
 Server_Socket.Run()
 def RunServer():
     #開啟FlaskServer
-    server_flask.run(host=config_data["FlaskServer"]["SocketHost"],port=config_data["FlaskServer"]["Port"])
+    server_flask.run(host=config_data["FlaskServer"]["IP"],port=config_data["FlaskServer"]["Port"])

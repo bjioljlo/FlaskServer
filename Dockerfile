@@ -5,6 +5,8 @@ RUN pip install numpy
 
 RUN pip install --upgrade pip
 
+RUN apt-get update
+
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
   tar -xvzf ta-lib-0.4.0-src.tar.gz && \
   cd ta-lib/ && \
@@ -20,9 +22,12 @@ WORKDIR /FlaskServer
 # 將 Dockerfile 所在目錄下的所有檔案複製到 Image 的工作目錄 /FlaskServer 底下
 ADD . /FlaskServer
 
-RUN sudo apt-get install python3-dev
+RUN apt-get install -y python3-dev
+
+RUN pip install setuptools build
 # 在 Image 中執行的指令：安裝 requirements.txt 中所指定的 dependencies
 RUN pip install -r requirements.txt
+
 
 EXPOSE 5010/tcp 5000/tcp
 

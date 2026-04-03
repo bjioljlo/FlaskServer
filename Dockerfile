@@ -1,35 +1,46 @@
-# Basic Image Environment
-FROM python:latest
+# 使用更稳定的Python基础镜像
+FROM python:3.10-slim
 
-RUN pip install numpy 
+# 设置环境变量
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-RUN pip install --upgrade pip
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    wget \
+    curl \
+    build-essential \
+    python3-dev \
+    libssl-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update
+# 安装TA-Lib C库
+RUN wget -O ta-lib-0.4.0-src.tar.gz http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-  tar -xvzf ta-lib-0.4.0-src.tar.gz && \
-  cd ta-lib/ && \
-  ./configure --prefix=/usr && \
-  make && \
-  make install
+# 升级pip并安装基础工具
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-RUN rm -R ta-lib ta-lib-0.4.0-src.tar.gz
-
-# 指定 Image 中的工作目錄
+# 指定工作目录
 WORKDIR /FlaskServer
 
-# 將 Dockerfile 所在目錄下的所有檔案複製到 Image 的工作目錄 /FlaskServer 底下
-ADD . /FlaskServer
+# 复制requirements.txt并安装依赖（利用Docker缓存优化）
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt-get install -y python3-dev
+# 复制应用代码
+COPY . .
 
-RUN pip install setuptools build
-# 在 Image 中執行的指令：安裝 requirements.txt 中所指定的 dependencies
-RUN pip install -r requirements.txt
+EXPOSE 50101/tcp 50001/tcp
 
-
-EXPOSE 5010/tcp 5000/tcp
-
-# Container 啟動指令：Container 啟動後通過 python 運行 runserver.py
+# 启动命令
 CMD ["python", "runserver.py"]

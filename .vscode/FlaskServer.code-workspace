@@ -1,8 +1,10 @@
 {
-	"folders": [
-		{
-			"path": "../"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "../"
+    }
+  ],
+  "settings": {
+    "workbench.colorTheme": "Shades of Purple (Super Dark)"
+  }
 }
